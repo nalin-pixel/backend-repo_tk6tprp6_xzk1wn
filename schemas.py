@@ -8,41 +8,68 @@ Each Pydantic model represents a collection in your database.
 Model name is converted to lowercase for the collection name:
 - User -> "user" collection
 - Product -> "product" collection
-- BlogPost -> "blogs" collection
+- BlogPost -> "blogpost" collection
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, EmailStr, HttpUrl
+from typing import Optional, List
+from datetime import datetime
 
-# Example schemas (replace with your own):
-
+# Core examples
 class User(BaseModel):
-    """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
     name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
+    email: EmailStr = Field(..., description="Email address")
+    address: Optional[str] = Field(None, description="Address")
     age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
     is_active: bool = Field(True, description="Whether user is active")
 
 class Product(BaseModel):
-    """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
     title: str = Field(..., description="Product title")
     description: Optional[str] = Field(None, description="Product description")
     price: float = Field(..., ge=0, description="Price in dollars")
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# NEXORA SYNERGY content models
+class Service(BaseModel):
+    icon: str = Field(..., description="Icon name (e.g., 'Code', 'Shield')")
+    title: str
+    slug: str
+    summary: str
+    content: Optional[str] = None
+    featured: bool = False
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Project(BaseModel):
+    title: str
+    slug: str
+    summary: str
+    content: Optional[str] = None
+    images: Optional[List[HttpUrl]] = None
+    tags: Optional[List[str]] = None
+    metrics: Optional[dict] = None
+
+class BlogPost(BaseModel):
+    title: str
+    slug: str
+    author: str
+    date: datetime
+    tags: Optional[List[str]] = None
+    excerpt: Optional[str] = None
+    coverImage: Optional[HttpUrl] = None
+    content: str
+
+class Testimonial(BaseModel):
+    name: str
+    role: Optional[str] = None
+    company: Optional[str] = None
+    quote: str
+    avatar: Optional[HttpUrl] = None
+
+class NewsletterSubscriber(BaseModel):
+    email: EmailStr
+
+class ContactMessage(BaseModel):
+    name: str
+    email: EmailStr
+    phone: Optional[str] = None
+    message: str
